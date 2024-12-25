@@ -18,7 +18,7 @@ pub fn add(filepath: &str) {
         Ok(index) => index, 
         Err(_) => Index::new(),
     };
-    index.add_index_object(filepath, &hash_code);
+    index.add_index_object(filepath, &hash_code, "A"); // A to denote that the file has been added but not commited
     if let Err(e) = index.write_index(INDEX_FILE_PATH) {
         eprintln!("Error writing to index file: {}", e);
         return; 

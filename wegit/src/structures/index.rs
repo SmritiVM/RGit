@@ -2,17 +2,19 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct IndexObject {
     pub filepath: String,
     pub hash_code: String, 
+    pub status: String,
 }
 
 impl IndexObject {
-    pub fn new(filepath: &str, hash_code: &str) -> Self {
+    pub fn new(filepath: &str, hash_code: &str, status: &str) -> Self {
         IndexObject {
             filepath: filepath.to_string(),
             hash_code: hash_code.to_string(),
+            status: status.to_string(),
         }
     }
 }
@@ -29,8 +31,8 @@ impl Index {
         }
     }
 
-    pub fn add_index_object(&mut self, filepath: &str, hash_code: &str) {
-        let index_object = IndexObject::new(filepath, hash_code);
+    pub fn add_index_object(&mut self, filepath: &str, hash_code: &str, status: &str) {
+        let index_object = IndexObject::new(filepath, hash_code, status);
         self.objects.insert(filepath.to_string(), index_object);
     }
 
@@ -43,10 +45,11 @@ impl Index {
 
         for line in content.lines() {
             let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() == 2 {
+            if parts.len() == 3 {
                 let filepath = parts[0].to_string();
                 let hash_code = parts[1].to_string();
-                index.add_index_object(&filepath, &hash_code);
+                let status = parts[2].to_string();
+                index.add_index_object(&filepath, &hash_code, &status);
             }
         }
 
@@ -61,7 +64,7 @@ impl Index {
             .open(file_path)?;
 
         for index_object in self.objects.values() {
-            writeln!(file, "{} {}", index_object.filepath, index_object.hash_code)?;
+            writeln!(file, "{} {} {}", index_object.filepath, index_object.hash_code, index_object.status)?;
         }
 
         Ok(())
