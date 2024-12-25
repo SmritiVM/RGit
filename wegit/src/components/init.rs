@@ -47,11 +47,6 @@ pub fn initialize_repository(directory_name: String) {
         return;
     }
 
-    if let Err(e) = create_index_file(&wegit_dir) {
-        eprintln!("Failed to create tracking files in .wegit: {}", e);
-        return;
-    }
-
     let file_objects_dir = wegit_dir.join("file_objects");
     if let Err(e) = fs::create_dir_all(&file_objects_dir) {
         eprintln!("Failed to create file objects directory: {}", e);
@@ -80,13 +75,6 @@ fn create_config_file(config_path: &Path, directory_name: &str) -> io::Result<()
 
     let mut config_file = File::create(config_path)?;
     config_file.write_all(toml_string.as_bytes())?;
-    Ok(())
-}
-
-fn create_index_file(wegit_dir: &Path) -> io::Result<()> {
-    let index_file_path = wegit_dir.join("index.txt");
-    File::create(index_file_path)?;
-
     Ok(())
 }
 
