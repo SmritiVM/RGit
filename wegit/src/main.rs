@@ -12,6 +12,10 @@ struct Args {
 #[derive(Subcommand, Debug)]
 enum Commands {
     SetupConfig,
+    Init{
+        #[clap(default_value_t = String::new())]
+        directory_name: String,
+    },
 }
 
 fn main() {
@@ -19,6 +23,7 @@ fn main() {
 
     match args.command {
         Commands::SetupConfig => components::configsetup::setup_global_config(),
+        Commands::Init{ directory_name } => components::init::initialize_repository(directory_name),
     }
 
 }
