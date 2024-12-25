@@ -25,7 +25,7 @@ fn get_user_input(prompt: &str) -> io::Result<String> {
 
 pub fn setup_global_config(){
     let home = home_dir().expect("Could not find home directory");
-    let config_path = home.join(".newconfig");
+    let config_path = home.join(".wegitconfig");
 
     if config_path.exists() {
        return
