@@ -1,6 +1,6 @@
 use crate::structures::paths;
-use std::fs::{File, OpenOptions};
-use std::io::{Read, Write};
+use std::fs::{OpenOptions};
+use std::io::{Write};
 
 #[derive(Debug, Clone)]
 struct Commit {

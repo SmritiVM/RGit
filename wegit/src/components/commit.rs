@@ -2,7 +2,7 @@ use crate::components::hash_and_compress;
 use crate::structures::commit;
 use crate::structures::paths;
 use std::fs::{File, OpenOptions};
-use std::io::{Read, Write, Error, ErrorKind};
+use std::io::{Read, Write};
 
 #[derive(Debug, Clone)]
 struct Commit {
@@ -20,6 +20,8 @@ pub fn commit_changes(commit_message: &str) {
         }
     };
 
+    update_head_path(commit_id);
+
     let index_hash = match File::open(paths::INDEX)
     .and_then(|mut file| file.read_to_string(&mut String::new()).map(|_| file))
     {
@@ -33,18 +35,36 @@ pub fn commit_changes(commit_message: &str) {
     commit::create_commit(&commit_id, &index_hash, commit_message);
 }
 
-fn get_current_commit_id() -> Option<u64>{
+fn get_current_commit_id() -> Option<u64> {
+    let mut index_content = String::new();  
     let commit_id: u64 = match File::open(paths::HEAD)
-    .and_then(|mut file| file.read_to_string(&mut String::new()).map(|_| file))
-    .and_then(|_| String::new().trim().parse().map_err(|e| Error::new(ErrorKind::InvalidData, e)))
+        .and_then(|mut file| file.read_to_string(&mut index_content))  
     {
-        Ok(id) => id,
+        Ok(_) => match index_content.trim().parse::<u64>() {
+            Ok(id) => id,  
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                return None; 
+            }
+        },
         Err(e) => {
-            eprintln!("Error: {}", e);
+            eprintln!("Error: {}", e);  
             return None;
         }
     };
     Some(commit_id)
+}
+
+fn update_head_path(commit_id: u64) {
+    let mut head_file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(paths::HEAD)
+        .expect("Unable to open HEAD file");
+
+    writeln!(head_file, "{}", commit_id)
+        .expect("Unable to write new commit_id to head");
 }
 
 
