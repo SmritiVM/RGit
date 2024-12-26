@@ -14,15 +14,21 @@ pub fn add(filepath: &str) {
     };
     let hash_code = hash_and_compress::calculate_sha1(&data); 
 
-    let mut index = match Index::read_index(paths::INDEX) {
+    write_objects(paths::INDEX, filepath, &hash_code);
+    write_objects(paths::STAGED, filepath, &hash_code);
+
+    handle_message(format!("File '{}' added.", filepath));
+    hash_and_compress::create_object(Path::new(paths::FILE_OBJECTS), &data, &hash_code);
+}
+
+fn write_objects(filepath: &str, object_path: &str, object_hash: &str){
+    let mut index = match Index::read_index(filepath) {
         Ok(index) => index, 
         Err(_) => Index::new(),
     };
-    index.add_index_object(filepath, &hash_code);
-    if let Err(_) = index.write_index(paths::INDEX) {
+    index.add_index_object(object_path, object_hash);
+    if let Err(_) = index.write_index(filepath) {
         handle_message("Fatal, not a git repo!");
         return; 
     }
-    handle_message(format!("File '{}' added.", filepath));
-    hash_and_compress::create_object(Path::new(paths::FILE_OBJECTS), &data, &hash_code);
 }

@@ -7,6 +7,12 @@ use std::io::{Read, Write};
 use std::path::Path;
 
 pub fn commit_changes(commit_message: &str) {
+    let staged_path = Path::new(paths::STAGED);
+    if !staged_path.exists() {
+        handle_message("No changes staged for commit.");
+        return; 
+    }
+
     let commit_id = match get_current_commit_id() {
         Some(id) => id + 1,
         None => {
@@ -28,6 +34,8 @@ pub fn commit_changes(commit_message: &str) {
     let index_hash = hash_and_compress::calculate_sha1(&index_data); 
     commit::create_commit(commit_id, &index_hash, commit_message);
     hash_and_compress::create_object(Path::new(paths::INDEX_OBJECTS), &index_data, &index_hash)
+
+    delete_staged_changes(staged_path);
 }
 
 fn get_current_commit_id() -> Option<u64> {
@@ -60,4 +68,10 @@ fn update_head(commit_id: u64) {
 
     writeln!(head_file, "{}", commit_id)
         .expect("Unable to write new commit_id to head");
+}
+
+fn delete_staged_changes(staged_path) {
+    if let Err(e) = remove_dir_all(staged_path) {
+        handle_message(format!("Failed to delete staged changes: {}", e));
+    } 
 }
