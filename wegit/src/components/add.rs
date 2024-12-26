@@ -7,7 +7,7 @@ pub fn add(filepath: &str) {
     let data = match std::fs::read(filepath) {
         Ok(data) => data,
         Err(e) => {
-            eprintln!("Error reading file '{}': {}", filepath, e);
+            eprintln!("Oops! File doesn't exist in this directory");
             return; 
         }
     };
@@ -17,9 +17,9 @@ pub fn add(filepath: &str) {
         Ok(index) => index, 
         Err(_) => Index::new(),
     };
-    index.add_index_object(filepath, &hash_code, "A"); // A to denote that the file has been added but not commited
+    index.add_index_object(filepath, &hash_code);
     if let Err(e) = index.write_index(paths::INDEX) {
-        eprintln!("Error writing to index file: {}", e);
+        eprintln!("Fatal, not a git repo!");
         return; 
     }
     println!("File '{}' added.", filepath);
