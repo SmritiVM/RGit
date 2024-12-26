@@ -14,7 +14,7 @@ pub fn commit_changes(commit_message: &str) {
         }
     };
 
-    update_head_path(commit_id);
+    update_head(commit_id);
 
     let index_data = match std::fs::read(paths::INDEX){
         Ok(index_data) => index_data,
@@ -49,7 +49,7 @@ fn get_current_commit_id() -> Option<u64> {
     Some(commit_id)
 }
 
-fn update_head_path(commit_id: u64) {
+fn update_head(commit_id: u64) {
     let mut head_file = OpenOptions::new()
         .write(true)
         .create(true)
