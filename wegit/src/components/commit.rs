@@ -3,13 +3,7 @@ use crate::structures::commit;
 use crate::structures::paths;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
-
-#[derive(Debug, Clone)]
-struct Commit {
-    commit_id: u64,
-    index_hash: String,
-    commit_message: String,
-}
+use std::path::Path;
 
 pub fn commit_changes(commit_message: &str) {
     let commit_id = match get_current_commit_id() {
@@ -22,17 +16,17 @@ pub fn commit_changes(commit_message: &str) {
 
     update_head_path(commit_id);
 
-    let index_hash = match File::open(paths::INDEX)
-    .and_then(|mut file| file.read_to_string(&mut String::new()).map(|_| file))
-    {
-        Ok(_) => hash_and_compress::calculate_sha1(String::new().as_bytes()),
+    let index_data = match std::fs::read(paths::INDEX){
+        Ok(index_data) => index_data,
         Err(e) => {
             eprintln!("Error: {}", e);
-            return;
+            return; 
         }
     };
 
+    let index_hash = hash_and_compress::calculate_sha1(&index_data); 
     commit::create_commit(commit_id, &index_hash, commit_message);
+    hash_and_compress::create_object(Path::new(paths::INDEX_OBJECTS), &index_data, &index_hash)
 }
 
 fn get_current_commit_id() -> Option<u64> {
@@ -66,6 +60,3 @@ fn update_head_path(commit_id: u64) {
     writeln!(head_file, "{}", commit_id)
         .expect("Unable to write new commit_id to head");
 }
-
-
-
