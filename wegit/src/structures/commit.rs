@@ -11,11 +11,17 @@ pub struct Commit {
     commit_message: String,
 }
 
+impl Commit{
+    fn new(index_hash: &str, commit_message: &str) -> Self {
+        Commit {
+            index_hash: index_hash.to_string(),
+            commit_message: commit_message.to_string(),
+        }
+    }
+}
+
 pub fn create_commit(commit_id: u64, index_hash: &str, commit_message: &str) {
-    let new_commit = Commit {
-        index_hash: index_hash.to_string(),
-        commit_message: commit_message.to_string(),
-    };
+    let new_commit = Commit::new(index_hash, commit_message);
 
     let mut commits: HashMap<String, Commit> = read_commits().unwrap_or_else(|_| HashMap::new());
     let commit_key = format!("{}", commit_id);
