@@ -7,8 +7,8 @@ use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Commit {
-    index_hash: String,
-    commit_message: String,
+    pub index_hash: String,
+    pub commit_message: String,
 }
 
 impl Commit{
