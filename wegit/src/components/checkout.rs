@@ -5,6 +5,7 @@ use std::env;
 use crate::structures::commit::read_commits;
 use crate::structures::paths::{INDEX_OBJECTS, FILE_OBJECTS}; 
 use crate::utils::hash_and_compress;
+use crate::utils::message_handler::handle_message;
 
 pub fn checkout(commit_id: &str) {
     let working_dir = match env::current_dir() {
@@ -49,4 +50,5 @@ pub fn checkout(commit_id: &str) {
             }
         }
     }
+    handle_message(format!("Successfully checked out commit ID: {}", commit_id));
 }
