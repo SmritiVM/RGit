@@ -32,7 +32,7 @@ pub fn commit_changes(commit_message: &str) {
         }
     };
 
-    commit::create_commit(&commit_id, &index_hash, commit_message);
+    commit::create_commit(commit_id, &index_hash, commit_message);
 }
 
 fn get_current_commit_id() -> Option<u64> {
