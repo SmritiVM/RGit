@@ -1,22 +1,52 @@
-write a function that simulates git checkout <commit id>
-it should take <commit id> as a parameter.
-there is a commit file stored in structures::paths::COMMIT
-the checkout function should read all the commit objects by invoking the read_commits function in structures::commit
+use std::fs::{self, OpenOptions};
+use std::io::{Write};
+use std::path::Path;
+use std::env;
+use crate::structures::commit::read_commits;
+use crate::structures::paths::{INDEX_OBJECTS, FILE_OBJECTS}; 
+use crate::utils::hash_and_compress;
 
-the function is as follows:
-pub fn read_commits() -> Result<HashMap<String, Commit>, std::io::Error> {
-    use std::fs::File;
-    use std::io::Read;
+pub fn checkout(commit_id: &str) {
+    let working_dir = match env::current_dir() {
+        Ok(dir) => dir,
+        Err(_) => return, 
+    };
 
-    let mut file = File::open(paths::COMMIT)?;
-    let mut toml_string = String::new();
-    file.read_to_string(&mut toml_string)?;
+    let commits = match read_commits() {
+        Ok(commits) => commits,
+        Err(_) => return, 
+    };
 
-    let commits: HashMap<String, Commit> = toml::de::from_str(&toml_string)
-        .expect("Failed to deserialize commits from TOML");
+    if let Some(commit) = commits.get(commit_id) {
+        let index_hash = &commit.index_hash;
+        let index_data = match hash_and_compress::retrieve_object(Path::new(INDEX_OBJECTS), index_hash) {
+            Ok(data) => data,
+            Err(_) => return, 
+        };
 
-    Ok(commits)
+        let index_file_content = match String::from_utf8(index_data) {
+            Ok(content) => content,
+            Err(_) => return, 
+        };
+        let lines = index_file_content.lines();
+
+        for line in lines {
+            let mut parts = line.split_whitespace();
+            if let (Some(file_path), Some(file_content_hash)) = (parts.next(), parts.next()) {
+                let file_content = match hash_and_compress::retrieve_object(Path::new(FILE_OBJECTS), file_content_hash) {
+                    Ok(content) => content,
+                    Err(_) => continue, 
+                };
+
+                let full_path = working_dir.join(file_path);
+                if let Err(_) = fs::create_dir_all(full_path.parent().unwrap()) {
+                    continue;
+                }
+
+                if let Ok(mut file) = OpenOptions::new().write(true).create(true).open(full_path) {
+                    let _ = file.write_all(&file_content);
+                }
+            }
+        }
+    }
 }
-
-after reading the commits, it should fetch the index_hash corresponding to the commit_id in the parameter
-after getting the index_hash, it should take objects dir as structures::paths::INDEX_OBJECTS and then call the retrieve objects function to get the contents of the index file at that point

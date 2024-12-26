@@ -23,6 +23,9 @@ enum Commands {
     },
     Commit{
         commit_message: String,
+    },
+    Checkout{
+        commit_id: String,
     }
 }
 
@@ -34,6 +37,7 @@ fn main() {
         Commands::Init{ directory_name } => components::init::initialize_repository(directory_name),
         Commands::Add{ file_name } => components::add::add(&file_name),
         Commands::Commit { commit_message } => components::commit::commit_changes(&commit_message),
+        Commands::Checkout { commit_id } => components::checkout::checkout(&commit_id),
     }
 
 }
