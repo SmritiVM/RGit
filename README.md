@@ -1,93 +1,132 @@
-# Rustgit
+# RGitS
 
+## Getting Started 
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+Project structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/rusla/rustgit.git
-git branch -M main
-git push -uf origin main
+wegit/
+├── src/
+│   ├── main.rs     
+│   └── components
+│   └── structures
+│   └── utils    
+└── Cargo.toml       // Project metadata and dependencies
 ```
 
-## Integrate with your tools
+Make the script executable
 
-- [ ] [Set up project integrations](https://gitlab.com/rusla/rustgit/-/settings/integrations)
+To make the Rust binary executable, you compile it using:
 
-## Collaborate with your team
+``` cargo build --release ```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+The resulting executable will be located in ./target/release/wyag.
 
-## Test and Deploy
+If you'd like it to be easily runnable from anywhere, you can copy it to a directory in your $PATH:
 
-Use the built-in continuous integration in GitLab.
+``` cp target/release/wegit /usr/local/bin/wegit```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Now the binary executable has been created, type ```wegit``` in the terminal to run it 
 
-***
+### Insights
+This can also be run using ```cargo run```
 
-# Editing this README
+## Adding command-line arguments
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+1.Install the clap library for argument parsing.
 
-## Suggestions for a good README
+Add the following to Cargo.toml:
+```
+[dependencies]
+clap = { version = "4.3", features = ["derive"] }
+```
+2.    Update src/main.rs to handle command-line arguments like the Python version.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Use ```clap``` to parse arguments and subcommands
+Use ```enums``` to match subcommands, similar to Python's ```match-case```
 
-## Name
-Choose a self-explaining name for your project.
+The version attribute of the #[command] macro is what is displayed when ```<command name> --version``` is entered. Similarly the about attribute is mapped to ```--help```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+To execute the command, build again using ```cargo build --release``` and run using ```/target/release/wegit <command name>```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## Git Init
+Git Init is used to initialize a directory as a git repository. The sequence of actions when ```wegit init``` is run is as follows:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+1. A new directory (folder) is created with the directory name passed as an argument. If no directory name is passed, the current directory name is taken as the directory name
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+2. A ```.wegit``` folder in the directory
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+3. A ```config.toml``` file in the ```.wegit``` that contains the configurations.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+4. The local config.toml should derive the [user] field from the global config.toml. This is set up using configsetup.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+6. A `file_objects` and `index_objects` folder to store the compressed contents of the file when git add is performed and git commit are performed respectively.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Commands/Operators Learnt
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Creation of a new directory happens with the fs::create_dir_all function from the std::fs library
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+```eprintln!``` is especially used to print errors. It will be sent to the Standard Error stream rather than the standard output stream
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```to_string_pretty``` generates TOML data as a String with extra whitespace (indentation) to improve the readability of the resulting TOML file
 
-## License
-For open source projects, say how it is licensed.
+```.and_then(|user_section| { ... })```
+.and_then() is a combinator on Option<T>. It takes a closure (the code inside the curly braces) and applies it to the value inside the Option if the option is Some(value).
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+If the option is None (i.e., if the "user" section doesn't exist in the TOML), the closure is never executed, and None is returned.
+
+If "user" is found (i.e., the value inside the Option is Some), it passes user_section (the value associated with "user") to the closure.
+
+
+```.ok()``` converts a Result into an Option. If to_string() succeeds, it returns Some(String). If it fails, it returns None.
+
+```?``` is the "try" operator, which returns None immediately if to_string() fails (i.e., if it returns Err).
+
+`::` helps you refer to and access elements from various namespaces, such as modules, types, methods, constants, and enums. It clarifies where each item comes from and makes the code more organized and structured.
+
+
+In Rust, an `enum` (short for "enumeration") is a type that can represent one of several possible variants. Enums are used to define a type that can take on different values, each representing a different state or variant. Each variant can be simple, like a single value, or more complex, containing associated data.
+
+### Insights
+- `?` vs `expect`
+
+| Feature                | `?` Operator                                        | `expect` Method                              |
+|------------------------|-----------------------------------------------------|----------------------------------------------|
+| **Error Handling**      | Propagates errors to the caller                     | Causes a panic and terminates the program    |
+| **Return Type**         | Requires the function to return `Result<T, E>` or `Option<T>` | Requires the function to return `Result<T, E>` or `Option<T>` |
+| **Use Case**            | Used when you want to propagate errors without halting execution | Used when you want to ensure success and panic on failure |
+| **Error Message**       | No custom error message, the error is returned as-is | Custom error message can be provided when the panic occurs |
+
+
+
+- While parsing toml files, ChatGPT suggests using ```use serde::Serialize;```. The rust compiler throws the following error:
+```
+error: cannot find derive macro `Serialize` in this scope
+ --> src/libwegit.rs:8:10
+  |
+8 | #[derive(Serialize)]
+  |          ^^^^^^^^^
+  |
+note: `Serialize` is imported here, but it is only a trait, without a derive macro
+ --> src/libwegit.rs:6:5
+  |
+6 | use serde::Serialize;
+  |     ^^^^^^^^^^^^^^^^
+help: consider importing this derive macro
+  |
+1 + use serde_derive::Serialize;
+
+```
+```use serde_derive::Serialize``` is the macro to be imported.
+
+## Git Add
+Steps in git add
+
+1. Addition of ```<file path> <file hash>``` to the index.txt file in # wegitS
+2. Creation of a compressed version of the file in the ```file_objects``` folder of the .wegit
+
+Git stores these objects using SHA-1 hashing and organizes them in subdirectories based on the first two characters of the hash. Specifically:
+
+The content of the file is hashed to generate a SHA-1 object identifier.
+The object is stored as a file in .git/objects/`<first two characters of the SHA-1 hash>/<remaining characters of the SHA-1 hash>.`
+
