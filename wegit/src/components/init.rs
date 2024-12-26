@@ -41,6 +41,12 @@ pub fn initialize_repository(directory_name: String) {
         return;
     }
 
+    let head_path = wegit_dir.join("HEAD");
+    if let Err(e) = create_head_file(&head_path) {
+        eprintln!("Failed to create HEAD file: {}", e);
+        return;
+    }
+
     let config_path = wegit_dir.join("config.toml");
     if let Err(e) = create_config_file(&config_path, &directory_name) {
         eprintln!("Failed to create config.toml: {}", e);
@@ -90,4 +96,10 @@ fn read_user_from_config_toml() -> Option<UserConfig> {
         let user_str = toml::ser::to_string(&user_section).ok()?; 
         toml::de::from_str(&user_str).ok()
     })
+}
+
+fn create_head_file(head_path: &Path) -> io::Result<()> {
+    let mut head_file = File::create(head_path)?;
+    head_file.write_all(b"0")?;
+    Ok(())
 }
