@@ -1,11 +1,28 @@
-I want to model git commit as list
-give the code that creates a Commit structure in Rust 
-the Commit structure should be modelled as a list of CommitObjects
-each commit object / node in the list should have the following - commit id, index hash, commit message
+use crate::structures::paths;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 
-Write a function create commit that does the following
-the commit id should be calculated by reading the .wegit/HEAD file. The HEAD file contains just a number, commit id is one plus the number in HEAD. HEAD gets updated to hold the new commit id.
-the index hash is calculated by reading .wegit/index. Call the calculate_sha1 function from the hash_and_compress module to calculate hash_code
-commit message is a string parameter that is passed
-.wegit/commit should store all the commitobjects
-After the commit object is created, it should be appended .wegit/commit and stored there.
+#[derive(Debug, Clone)]
+struct Commit {
+    commit_id: u64,
+    index_hash: String,
+    commit_message: String,
+}
+
+pub fn create_commit(commit_id: &u64, index_hash: &str, commit_message: &str) {
+    let new_commit = Commit {
+        commit_id: *commit_id,
+        index_hash: index_hash.to_string(),
+        commit_message: commit_message.to_string(),
+    };
+
+    if let Err(e) = OpenOptions::new()
+    .append(true)
+    .create(true)
+    .open(paths::COMMIT)
+    .and_then(|mut file| writeln!(file, "{:?}", new_commit).map(|_| file))
+    {
+        eprintln!("Error: {}", e);
+        return;
+    }
+}
