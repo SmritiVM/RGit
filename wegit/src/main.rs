@@ -19,6 +19,9 @@ enum Commands {
     },
     Add{
         file_name: String,
+    },
+    Commit{
+        commit_message: String,
     }
 }
 
@@ -29,6 +32,7 @@ fn main() {
         Commands::SetupConfig => components::configsetup::setup_global_config(),
         Commands::Init{ directory_name } => components::init::initialize_repository(directory_name),
         Commands::Add{ file_name } => components::add::add(&file_name),
+        Commands::Commit { commit_message } => components::commit::commit_changes(&commit_message),
     }
 
 }
