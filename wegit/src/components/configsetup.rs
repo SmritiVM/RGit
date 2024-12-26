@@ -1,6 +1,7 @@
 use std::fs;
 use std::io::{self, Write};
 use dirs::home_dir;
+use crate::utils::message_handler::handle_message;
 use serde::{Deserialize, Serialize};
 use toml;
 
@@ -31,7 +32,7 @@ pub fn setup_global_config(){
        return
     }
 
-    println!("First-time setup. Please enter your details:");
+    handle_message("First-time setup. Please enter your details:");
     let name = get_user_input("Enter your name: ");
     let email = get_user_input("Enter your email: ");
 
@@ -41,5 +42,5 @@ pub fn setup_global_config(){
 
     let toml_string = toml::to_string(&config).expect("Failed to serialize config");
     let _= fs::write(config_path, toml_string);
-    println!("Global config created successfully!");
+    handle_message("Global config created successfully!");
 }

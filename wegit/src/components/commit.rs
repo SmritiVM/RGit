@@ -1,6 +1,7 @@
-use crate::components::hash_and_compress;
+use crate::utils::hash_and_compress;
 use crate::structures::commit;
 use crate::structures::paths;
+use crate::utils::message_handler::handle_message;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -9,7 +10,7 @@ pub fn commit_changes(commit_message: &str) {
     let commit_id = match get_current_commit_id() {
         Some(id) => id + 1,
         None => {
-            eprintln!("Failed to get commit ID.");
+            handle_message("Failed to get commit ID.");
             return
         }
     };
@@ -19,7 +20,7 @@ pub fn commit_changes(commit_message: &str) {
     let index_data = match std::fs::read(paths::INDEX){
         Ok(index_data) => index_data,
         Err(e) => {
-            eprintln!("Error: {}", e);
+            handle_message(e);
             return; 
         }
     };
@@ -37,12 +38,12 @@ fn get_current_commit_id() -> Option<u64> {
         Ok(_) => match index_content.trim().parse::<u64>() {
             Ok(id) => id,  
             Err(e) => {
-                eprintln!("Error: {}", e);
+                handle_message(e);
                 return None; 
             }
         },
         Err(e) => {
-            eprintln!("Error: {}", e);  
+            handle_message(e);
             return None;
         }
     };

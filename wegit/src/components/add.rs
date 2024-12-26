@@ -1,5 +1,6 @@
 use crate::structures::index::{Index}; 
-use crate::components::hash_and_compress;
+use crate::utils::message_handler::handle_message;
+use crate::utils::hash_and_compress;
 use crate::structures::paths;
 use std::path::Path;
 
@@ -7,9 +8,9 @@ pub fn add(filepath: &str) {
     let data = match std::fs::read(filepath) {
         Ok(data) => data,
         Err(e) => {
-            eprintln!("Oops! File doesn't exist in this directory");
-            return; 
-        }
+            handle_message(e);
+            return
+        },
     };
     let hash_code = hash_and_compress::calculate_sha1(&data); 
 
@@ -18,10 +19,10 @@ pub fn add(filepath: &str) {
         Err(_) => Index::new(),
     };
     index.add_index_object(filepath, &hash_code);
-    if let Err(e) = index.write_index(paths::INDEX) {
-        eprintln!("Fatal, not a git repo!");
+    if let Err(_) = index.write_index(paths::INDEX) {
+        handle_message("Fatal, not a git repo!");
         return; 
     }
-    println!("File '{}' added.", filepath);
+    handle_message(format!("File '{}' added.", filepath));
     hash_and_compress::create_object(Path::new(paths::FILE_OBJECTS), &data, &hash_code);
 }

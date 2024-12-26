@@ -4,6 +4,7 @@ use std::path::{Path};
 use std::env;
 use dirs::home_dir;
 use toml::ser::to_string_pretty;
+use crate::utils::message_handler::handle_message;
 use serde_derive::{Serialize, Deserialize};
 
 #[derive(Serialize)]
@@ -30,42 +31,42 @@ pub fn initialize_repository(directory_name: String) {
         directory_name
     };
 
-    if let Err(e) = fs::create_dir_all(&directory_name) {
-        eprintln!("Failed to create directory {}: {}", directory_name, e);
+    if let Err(_) = fs::create_dir_all(&directory_name) {
+        handle_message("Failed to create directory");
         return;
     }
 
     let wegit_dir = Path::new(&directory_name).join(".wegit");
-    if let Err(e) = fs::create_dir_all(&wegit_dir) {
-        eprintln!("Failed to create .wegit directory: {}", e);
+    if let Err(_) = fs::create_dir_all(&wegit_dir) {
+        handle_message("Failed to create .wegit directory");
         return;
     }
 
     let head_path = wegit_dir.join("HEAD");
-    if let Err(e) = create_head_file(&head_path) {
-        eprintln!("Failed to create HEAD file: {}", e);
+    if let Err(_) = create_head_file(&head_path) {
+        handle_message("Failed to create HEAD file");
         return;
     }
 
     let config_path = wegit_dir.join("config.toml");
-    if let Err(e) = create_config_file(&config_path, &directory_name) {
-        eprintln!("Failed to create config.toml: {}", e);
+    if let Err(_) = create_config_file(&config_path, &directory_name) {
+        handle_message("Failed to create config.toml");
         return;
     }
 
     let file_objects_dir = wegit_dir.join("file_objects");
-    if let Err(e) = fs::create_dir_all(&file_objects_dir) {
-        eprintln!("Failed to create file objects directory: {}", e);
+    if let Err(_) = fs::create_dir_all(&file_objects_dir) {
+        handle_message("Failed to create file objects directory");
         return;
     }
 
     let index_objects_dir = wegit_dir.join("index_objects");
-    if let Err(e) = fs::create_dir_all(&index_objects_dir) {
-        eprintln!("Failed to create index object directory: {}", e);
+    if let Err(_) = fs::create_dir_all(&index_objects_dir) {
+        handle_message("Failed to create index object directory");
         return;
     }
 
-    println!("Initialized empty wegit repository in '{}/.wegit'", directory_name);
+    handle_message("Initialized empty wegit repository");
 }
 
 fn create_config_file(config_path: &Path, directory_name: &str) -> io::Result<()> {
