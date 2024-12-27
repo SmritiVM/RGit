@@ -5,7 +5,7 @@ mod structures;
 mod utils;
 
 #[derive(Parser, Debug)]
-#[command(name = "wegit", version = "0.1.0", about = "Git in Rust")]
+#[command(name = "rgit", version = "0.1.0", about = "Git in Rust")]
 struct Args {
     #[command(subcommand)]
     command: Commands,

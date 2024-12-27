@@ -1,0 +1,7 @@
+site_name: RGit
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Commands: commands.md
+  - Learnings: learnings.md
+theme: readthedocs

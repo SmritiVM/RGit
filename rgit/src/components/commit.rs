@@ -9,7 +9,7 @@ use std::path::Path;
 pub fn commit_changes(commit_message: &str) {
     let staged_path = Path::new(paths::STAGED);
     if !staged_path.exists() {
-        handle_message("No changes staged for commit.");
+        handle_message("No changes staged for commit. Did you forget `rgit add <filepath>`?");
         return; 
     }
 

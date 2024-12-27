@@ -26,7 +26,7 @@ fn get_user_input(prompt: &str) -> io::Result<String> {
 
 pub fn setup_global_config(){
     let home = home_dir().expect("Could not find home directory");
-    let config_path = home.join(".wegitconfig");
+    let config_path = home.join(".rgitconfig");
 
     if config_path.exists() {
        return
