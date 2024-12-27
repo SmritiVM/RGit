@@ -1,19 +1,48 @@
-# WeGit in Rust
-
-Implementaion of Git in Rust
-
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+# RGit - Git in Rust
 
 ## Commands
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+* `rgit setup-config` - Setup the Global Configuration for your rgit.
+* `rgit init` / `rgit init <directory_name>` - Initialize an rgit repository.
+* `rgit add <file_path>` - Add a particular file to stage it for commits.
+* `rgit commit <message>` - Commit the added changes.
+* `rgit log` - View a log of all the commits.
+* `rgit jump-to <commit_id>` - Jump to a specific commit to restore the working directory state
 
-## Project layout
+## Setup
+To create the binary executable run `cargo build` and the build file will get stored in the target/debug directory.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Run `sudo cp target/release/rgit /usr/local/bin/rgit` to copy the binary executable to the local system.
+
+Type `rgit <command_name>` from any directory to run the executable
+
+## Project structure
+Project structure
+
+```
+rgit/
+├── src/
+│   ├── main.rs     
+│   └── components
+|       └── configsetup.rs
+|       └── init.rs
+|       └── add.rs
+|       └── commit.rs
+|       └── log.rs
+|       └── jumpto.rs
+|       └── mod.rs
+│   └── structures
+|       └── index.rs
+|       └── commit.rs
+|       └── paths.rs
+|       └── mod.rs
+│   └── utils
+|       └── hash_and_compress.rs
+|       └── message_handler.rs
+|       └── mod.rs    
+└── target/
+└── Cargo.lock
+└── Cargo.toml
+
+```
+

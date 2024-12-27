@@ -1,7 +1,6 @@
 site_name: RGit
 nav:
   - Home: index.md
-  - Installation: installation.md
   - Commands: commands.md
-  - Learnings: learnings.md
+  - Structures and Utils: structures_utils.md
 theme: readthedocs
