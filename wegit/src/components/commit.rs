@@ -2,7 +2,7 @@ use crate::utils::hash_and_compress;
 use crate::structures::commit;
 use crate::structures::paths;
 use crate::utils::message_handler::handle_message;
-use std::fs::{File, OpenOptions};
+use std::fs::{File, OpenOptions, remove_dir_all};
 use std::io::{Read, Write};
 use std::path::Path;
 
@@ -33,7 +33,7 @@ pub fn commit_changes(commit_message: &str) {
 
     let index_hash = hash_and_compress::calculate_sha1(&index_data); 
     commit::create_commit(commit_id, &index_hash, commit_message);
-    hash_and_compress::create_object(Path::new(paths::INDEX_OBJECTS), &index_data, &index_hash)
+    hash_and_compress::create_object(Path::new(paths::INDEX_OBJECTS), &index_data, &index_hash);
 
     delete_staged_changes(staged_path);
 }
@@ -70,7 +70,7 @@ fn update_head(commit_id: u64) {
         .expect("Unable to write new commit_id to head");
 }
 
-fn delete_staged_changes(staged_path) {
+fn delete_staged_changes(staged_path: &Path) {
     if let Err(e) = remove_dir_all(staged_path) {
         handle_message(format!("Failed to delete staged changes: {}", e));
     } 
