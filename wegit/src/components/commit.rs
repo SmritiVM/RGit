@@ -2,7 +2,7 @@ use crate::utils::hash_and_compress;
 use crate::structures::commit;
 use crate::structures::paths;
 use crate::utils::message_handler::handle_message;
-use std::fs::{File, OpenOptions, remove_dir_all};
+use std::fs::{File, OpenOptions, remove_file};
 use std::io::{Read, Write};
 use std::path::Path;
 
@@ -13,7 +13,7 @@ pub fn commit_changes(commit_message: &str) {
         return; 
     }
 
-    let commit_id = match get_current_commit_id() {
+    let commit_id = match get_commit_id() {
         Some(id) => id + 1,
         None => {
             handle_message("Failed to get commit ID.");
@@ -38,7 +38,7 @@ pub fn commit_changes(commit_message: &str) {
     delete_staged_changes(staged_path);
 }
 
-fn get_current_commit_id() -> Option<u64> {
+fn get_commit_id() -> Option<u64> {
     let mut index_content = String::new();  
     let commit_id: u64 = match File::open(paths::HEAD)
         .and_then(|mut file| file.read_to_string(&mut index_content))  
@@ -71,7 +71,7 @@ fn update_head(commit_id: u64) {
 }
 
 fn delete_staged_changes(staged_path: &Path) {
-    if let Err(e) = remove_dir_all(staged_path) {
+    if let Err(e) = remove_file(staged_path) {
         handle_message(format!("Failed to delete staged changes: {}", e));
-    } 
+    }
 }
