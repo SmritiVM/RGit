@@ -1,5 +1,5 @@
 [package]
-name = "wegit"
+name = "rgit"
 version = "0.1.0"
 edition = "2021"
 
